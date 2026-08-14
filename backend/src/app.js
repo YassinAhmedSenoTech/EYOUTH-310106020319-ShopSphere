@@ -27,8 +27,10 @@ if (process.env.NODE_ENV === 'test') {
   __dirname = path.dirname(__filename);
 }
 
-if (process.env.NODE_ENV !== 'test') {
-  connectMongoDB();
+if (process.env.NODE_ENV !== 'test' && process.env.MONGODB_URI) {
+  connectMongoDB().catch(err => {
+    console.warn('MongoDB connection failed (optional):', err.message);
+  });
 }
 
 app.use(helmet());

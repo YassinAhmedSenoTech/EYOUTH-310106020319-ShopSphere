@@ -80,7 +80,7 @@ const ProductDetails = () => {
       <div className="product-hero">
         {product.image && (
           <img 
-            src={`http://localhost:5000${product.image}`} 
+src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${product.image}`}
             alt={product.name} 
             className="product-image-large"
           />

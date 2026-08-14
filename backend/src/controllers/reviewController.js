@@ -1,34 +1,50 @@
-import Review from '../models/review.js';
+import { PrismaClient } from '@prisma/client';
+const prisma = new PrismaClient();
 
-export const createReview = async (req, res) => {
-  const { rating, comment } = req.body;
-  const review = await Review.create({
-    productId: req.params.productId,
-    userId: req.user.id,
-    userName: req.user.email, 
-    rating,
-    comment
-  });
-  res.status(201).json(review);
-};
-
+// Get reviews for a product
 export const getProductReviews = async (req, res) => {
-  const reviews = await Review.find({ productId: req.params.productId }).sort({ createdAt: -1 });
-  res.json(reviews);
+  try {
+    const { productId } = req.params;
+    const reviews = await prisma.review.findMany({
+      where: { productId },
+      include: { user: { select: { name: true } } },
+      orderBy: { createdAt: 'desc' }
+    });
+    res.json(reviews);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 };
 
+// Create a review
+export const createReview = async (req, res) => {
+  try {
+    const { productId, rating, comment } = req.body;
+    const userId = req.user.id; // Assuming auth middleware sets req.user
+    
+    const review = await prisma.review.create({
+      data: {
+        productId,
+        userId,
+        rating,
+        comment
+      }
+    });
+    res.status(201).json(review);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
 
+// Delete a review
 export const deleteReview = async (req, res) => {
   try {
-    const review = await Review.findById(req.params.reviewId);
-    
-    if (review && review.userId === req.user.id) {
-      await review.deleteOne();
-      res.json({ message: "Review deleted" });
-    } else {
-      res.status(403).json({ error: "Not authorized to delete this review" });
-    }
+    const { id } = req.params;
+    await prisma.review.delete({
+      where: { id }
+    });
+    res.json({ message: 'Review deleted' });
   } catch (error) {
-    res.status(500).json({ error: "Failed to delete review" });
+    res.status(500).json({ error: error.message });
   }
 };

@@ -1,12 +1,4 @@
-node_modules/
-
-
-
-dist/
-build/
-out/
-
-npm-debug.log*
-yarn-debug.log*
-yarn-test.log*
-.DS_Store
+node_modules
+.env
+.env.local
+.env.production

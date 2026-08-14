@@ -68,7 +68,7 @@ const Products = () => {
           <div key={product.id} className="product-card">
             {product.image && (
               <img 
-                src={`http://localhost:5000${product.image}`} 
+src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${product.image}`}
                 alt={product.name} 
                 className="product-image"
               />

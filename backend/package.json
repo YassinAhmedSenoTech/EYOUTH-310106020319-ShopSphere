@@ -4,11 +4,12 @@
   "description": "E-Commerce Platform Backend",
   "type": "module",
   "main": "src/app.js",
-  "scripts": {
-    "start": "npx prisma db push && npx prisma db seed && node src/app.js",
-    "dev": "nodemon src/app.js",
-    "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --detectOpenHandles --forceExit"
-  },
+"scripts": {
+  "start": "node src/app.js",
+  "build": "prisma generate",
+  "dev": "nodemon src/app.js",
+  "test": "cross-env NODE_OPTIONS='--experimental-vm-modules' jest --detectOpenHandles --forceExit"
+},
   "prisma": {
     "seed": "node prisma/seed.js"
   },

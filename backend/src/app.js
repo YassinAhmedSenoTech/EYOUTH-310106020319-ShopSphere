@@ -27,9 +27,9 @@ if (process.env.NODE_ENV === 'test') {
   __dirname = path.dirname(__filename);
 }
 
-if (process.env.NODE_ENV !== 'test' && process.env.MONGODB_URI) {
+if (process.env.NODE_ENV !== 'test' && process.env.MONGODB_URI && !process.env.VERCEL) {
   connectMongoDB().catch(err => {
-    console.warn('MongoDB connection failed (optional):', err.message);
+    console.warn('MongoDB connection failed:', err.message);
   });
 }
 

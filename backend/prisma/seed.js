@@ -1,22 +1,24 @@
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 
-
 const prisma = new PrismaClient();
 
-
 async function main() {
-  console.log('🌱 Seeding database with required data...');
+  console.log('🌱 Seeding database...');
 
-
-  await prisma.user.deleteMany({});
+  // Clear existing data (order matters for foreign keys)
+  await prisma.log.deleteMany({});
+  await prisma.review.deleteMany({});
+  await prisma.order.deleteMany({});
+  await prisma.product.deleteMany({});
   await prisma.category.deleteMany({});
+  await prisma.user.deleteMany({});
 
+  // Hash passwords
+  const adminPassword = await bcrypt.hash('Admin123!', 10);
+  const userPassword = await bcrypt.hash('User123!', 10);
 
-  const adminPassword = 'Admin'
-  const userPassword = 'User'
-
-
+  // Create admin
   await prisma.user.create({
     data: {
       name: 'Admin',
@@ -26,7 +28,7 @@ async function main() {
     },
   });
 
-
+  // Create regular user
   await prisma.user.create({
     data: {
       name: 'User',
@@ -36,17 +38,15 @@ async function main() {
     },
   });
 
-
+  // Create default category
   await prisma.category.create({
     data: {
       name: 'Electronics'
     },
   });
 
-
   console.log('✅ Seeding complete!');
 }
-
 
 main()
   .catch((e) => {

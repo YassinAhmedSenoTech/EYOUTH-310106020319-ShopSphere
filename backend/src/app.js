@@ -112,12 +112,12 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-app.use(cors({
-  origin: process.env.FRONTEND_URL || '*',
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+
+const allowedOrigins = [
+  process.env.FRONTEND_URL?.trim(),
+  'http://localhost:3000',
+  'http://localhost:5173'
+].filter(Boolean);
 
 app.use(express.json());
 

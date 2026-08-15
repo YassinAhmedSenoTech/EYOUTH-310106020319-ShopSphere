@@ -1,14 +1,18 @@
 import prisma from '../config/prisma.js';
-import Log from '../models/Log.js';
 
-// Safe logging - won't crash if MongoDB is down
+// Safe logging using Prisma (PostgreSQL/Supabase)
 const addLog = async (adminId, action, targetId, details) => {
   try {
-    if (Log && Log.create) {
-      await Log.create({ adminId: adminId || 'System', action, targetId, details });
-    }
+    await prisma.log.create({
+      data: {
+        adminId: adminId || 'System',
+        action,
+        targetId,
+        details: details || {}
+      }
+    });
   } catch (err) {
-    console.warn("Logging skipped (MongoDB unavailable):", err.message);
+    console.warn("Logging failed:", err.message);
   }
 };
 
@@ -87,7 +91,11 @@ export const getProducts = async (req, res) => {
 export const createProduct = async (req, res) => {
   try {
     const { name, description, price, stock, categoryId } = req.body;
-    const imagePath = req.file ? req.file.path : null;
+    
+    // IMPORTANT: If using Cloudinary, req.file.path should be the Cloudinary URL
+    // If your Cloudinary setup puts the URL somewhere else (e.g., req.file.secure_url), change this
+    const imageUrl = req.file ? req.file.path : null;
+    
     const product = await prisma.product.create({ 
       data: { 
         name, 
@@ -95,7 +103,7 @@ export const createProduct = async (req, res) => {
         price: parseFloat(price), 
         stock: parseInt(stock), 
         categoryId, 
-        image: imagePath 
+        image: imageUrl 
       } 
     });
     await addLog(req.user?.id, 'Created Product', product.id, { name });
@@ -173,24 +181,20 @@ export const deleteOrder = async (req, res) => {
 
 export const getLogs = async (req, res) => {
   try {
-    // If MongoDB is not available, return empty array instead of crashing
-    if (!Log || !Log.find) {
-      return res.json([]);
-    }
-    const logs = await Log.find().sort({ createdAt: -1 }).limit(20);
+    const logs = await prisma.log.findMany({
+      orderBy: { createdAt: 'desc' },
+      take: 20
+    });
     res.json(logs);
   } catch (error) {
-    console.warn("Logs fetch failed (MongoDB unavailable):", error.message);
-    res.json([]); // Return empty instead of 500
+    console.warn("Logs fetch failed:", error.message);
+    res.json([]);
   }
 };
 
 export const clearLogs = async (req, res) => {
   try {
-    if (!Log || !Log.deleteMany) {
-      return res.json({ message: "Logs cleared (MongoDB unavailable)" });
-    }
-    await Log.deleteMany({}); 
+    await prisma.log.deleteMany({});
     res.json({ message: "All logs cleared" });
   } catch (error) {
     res.status(500).json({ error: "Failed to clear logs" });

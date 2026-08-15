@@ -5,6 +5,15 @@ import api from '../api/axiosConfig';
 import '../style/products.css'; 
 
 const Products = () => {
+
+const getImageUrl = (image) => {
+  if (!image) return '';
+  if (image.startsWith('http')) return image; // Cloudinary URL — use directly
+  const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+  return `${baseUrl}${image}`; // Old local path — prepend API
+};
+
+
   const [params, setParams] = useState({ search: '', category: '', sort: 'createdAt_desc', page: 1 });
   const [searchInput, setSearchInput] = useState(''); 
   const [categories, setCategories] = useState([]); 
@@ -67,11 +76,11 @@ const Products = () => {
         {products.map((product) => (
           <div key={product.id} className="product-card">
             {product.image && (
-              <img 
-src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${product.image}`}
-                alt={product.name} 
-                className="product-image"
-              />
+    <img 
+  src={getImageUrl(product.image)} 
+  alt={product.name} 
+  className="product-image"
+/>
             )}
             <h3>{product.name}</h3>
             <p style={{fontWeight: 'bold', color: '#333'}}>${product.price}</p>

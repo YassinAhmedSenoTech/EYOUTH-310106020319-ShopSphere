@@ -6,6 +6,16 @@ import api from '../api/axiosConfig';
 import '../style/ProductDetails.css';
 
 const ProductDetails = () => {
+
+// Add this helper at the top of each component (before the return)
+const getImageUrl = (image) => {
+  if (!image) return '';
+  if (image.startsWith('http')) return image; // Cloudinary URL — use directly
+  const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
+  return `${baseUrl}${image}`; // Old local path — prepend API
+};
+
+
   const { id } = useParams(); 
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
@@ -46,12 +56,12 @@ const ProductDetails = () => {
       navigate('/login'); 
       return;
     }
-    addToCart({
-      id: product.id,
-      name: product.name,
-      price: product.price,
-      image: product.image 
-    });
+addToCart({
+  id: product.id,
+  name: product.name,
+  price: product.price,
+  image: getImageUrl(product.image) // Use the helper here too
+});
     alert("Added to cart!");
   };
 
@@ -79,11 +89,11 @@ const ProductDetails = () => {
     <div className="details-container">
       <div className="product-hero">
         {product.image && (
-          <img 
-src={`${import.meta.env.VITE_API_URL.replace('/api', '')}${product.image}`}
-            alt={product.name} 
-            className="product-image-large"
-          />
+<img 
+  src={getImageUrl(product.image)} 
+  alt={product.name} 
+  className="product-image-large"
+/>
         )}
         <div className="product-info">
           <h1>{product.name}</h1>

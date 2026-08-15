@@ -1,8 +1,7 @@
 import express from 'express';
 import * as adminController from '../controllers/adminController.js';
 import { protect, adminOnly } from '../middleware/authMiddleware.js';
-import multer from 'multer';
-const upload = multer({ dest: 'uploads/' });
+import { upload } from '../middleware/upload.js';
 
 const router = express.Router();
 

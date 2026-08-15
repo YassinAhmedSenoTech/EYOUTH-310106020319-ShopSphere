@@ -13,8 +13,8 @@ async function main() {
   await prisma.category.deleteMany({});
 
 
-  const adminPassword = await bcrypt.hash('Admin', 10);
-  const userPassword = await bcrypt.hash('User', 10);
+  const adminPassword = 'Admin'
+  const userPassword = 'User'
 
 
   await prisma.user.create({

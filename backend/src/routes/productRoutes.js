@@ -5,9 +5,12 @@ import {
   createProduct, 
   updateProduct,  
   deleteProduct   
-} from '../controllers/productController.js';import { protect } from '../middleware/authMiddleware.js';
+} from '../controllers/productController.js';
+import { protect } from '../middleware/authMiddleware.js';
 import { adminOnly } from '../middleware/adminMiddleware.js';
-import { upload } from '../middleware/upload.js';
+
+import { upload } from '../middleware/cloudinaryUpload.js';
+
 const router = express.Router();
 
 router.get('/', getProducts);

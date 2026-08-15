@@ -1,6 +1,4 @@
 import prisma from '../config/prisma.js';
-import Log from '../models/Log.js';
-
 
 export const getProducts = async (req, res) => {
   const { search, category, sort, page = 1, limit = 10 } = req.query;
@@ -11,12 +9,10 @@ export const getProducts = async (req, res) => {
     ...(category && { categoryId: category }) 
   };
 
-  
   let orderBy = { createdAt: 'desc' }; 
   if (sort === 'price_asc') orderBy = { price: 'asc' };
   if (sort === 'price_desc') orderBy = { price: 'desc' };
 
-  
   const [products, total] = await Promise.all([
     prisma.product.findMany({
       where,
@@ -27,9 +23,10 @@ export const getProducts = async (req, res) => {
     prisma.product.count({ where })
   ]);
 
+  // ✅ Cloudinary images are already full URLs — no path splitting needed
   const cleanedProducts = products.map((product) => ({
     ...product,
-    image: product.image ? product.image.split('\\').pop() : null
+    image: product.image || null
   }));
 
   res.json({ 
@@ -39,7 +36,6 @@ export const getProducts = async (req, res) => {
     totalPages: Math.ceil(total / limit) 
   });
 };
-
 
 export const getProductById = async (req, res) => {
   try {
@@ -54,9 +50,10 @@ export const getProductById = async (req, res) => {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    // ✅ Return image as-is (Cloudinary URL)
     const cleanedProduct = {
       ...product,
-      image: product.image ? product.image.split('\\').pop() : null
+      image: product.image || null
     };
 
     res.status(200).json(cleanedProduct);
@@ -64,10 +61,6 @@ export const getProductById = async (req, res) => {
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
-
-
-
-
 
 export const createProduct = async (req, res) => {
   try {
@@ -77,7 +70,8 @@ export const createProduct = async (req, res) => {
       return res.status(400).json({ error: "Please upload an image" });
     }
 
-    const imageFilename = req.file ? req.file.filename : 'test-image.jpg';
+    // ✅ Cloudinary returns the full URL in req.file.path
+    const imageUrl = req.file ? req.file.path : 'test-image.jpg';
 
     const product = await prisma.product.create({
       data: {
@@ -86,7 +80,7 @@ export const createProduct = async (req, res) => {
         price: parseFloat(price),
         stock: parseInt(stock),
         categoryId,
-        image: imageFilename
+        image: imageUrl
       }
     });
 
@@ -96,7 +90,6 @@ export const createProduct = async (req, res) => {
     res.status(400).json({ error: "Failed to create product." });
   }
 };
-
 
 export const updateProduct = async (req, res) => {
   const { id } = req.params;
@@ -108,7 +101,8 @@ export const updateProduct = async (req, res) => {
       return res.status(404).json({ error: "Product not found" });
     }
 
-    const imagePath = req.file ? req.file.path : existingProduct.image;
+    // ✅ Use req.file.path for Cloudinary URL
+    const imageUrl = req.file ? req.file.path : existingProduct.image;
 
     const updatedProduct = await prisma.product.update({
       where: { id },
@@ -118,7 +112,7 @@ export const updateProduct = async (req, res) => {
         price: price ? parseFloat(price) : existingProduct.price,
         stock: stock ? parseInt(stock) : existingProduct.stock,
         categoryId: categoryId || existingProduct.categoryId,
-        image: imagePath,
+        image: imageUrl,
       },
     });
 
@@ -128,6 +122,7 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ error: "Failed to update product" });
   }
 };
+
 export const deleteProduct = async (req, res) => {
   const { id } = req.params;
 

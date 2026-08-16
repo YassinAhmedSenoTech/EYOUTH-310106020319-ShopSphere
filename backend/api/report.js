@@ -22,4 +22,8 @@ export default async function handler(req, res) {
   } catch (error) {
     res.status(500).json({ error: 'Failed to generate report' });
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> de18c5e63184d125c29f46c99133de42b093ba9c

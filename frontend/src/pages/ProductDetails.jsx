@@ -4,20 +4,17 @@ import { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../context/CartContext'; 
 import api from '../api/axiosConfig';
 import '../style/ProductDetails.css';
+
 const REVIEW_API = 'https://eyouth-3101016020319-shop-sphere-review-service-gxelwec8g.vercel.app';
 
-
-const ProductDetails = () => {
-
-// Add this helper at the top of each component (before the return)
 const getImageUrl = (image) => {
   if (!image) return '';
-  if (image.startsWith('http')) return image; // Cloudinary URL — use directly
+  if (image.startsWith('http')) return image;
   const baseUrl = import.meta.env.VITE_API_URL.replace('/api', '');
-  return `${baseUrl}${image}`; // Old local path — prepend API
+  return `${baseUrl}${image}`;
 };
 
-
+const ProductDetails = () => {
   const { id } = useParams(); 
   const navigate = useNavigate();
   const { addToCart } = useContext(CartContext);
@@ -43,18 +40,22 @@ const getImageUrl = (image) => {
     queryFn: () => api.get(`/products/${id}`).then(res => res.data)
   });
 
-const fetchReviews = async () => {
-  try {
-    const res = await fetch(`${REVIEW_API}/reviews/${id}`);
-    if (!res.ok) throw new Error('Failed to fetch');
-    const data = await res.json();
-    setReviews(data);
-  } catch (err) { 
-    console.error("Error fetching reviews", err); 
-  }
-};
+  const fetchReviews = async () => {
+    console.log('Fetching reviews from:', `${REVIEW_API}/reviews/${id}`);
+    try {
+      const res = await fetch(`${REVIEW_API}/reviews/${id}`);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      console.log('Reviews loaded:', data);
+      setReviews(data);
+    } catch (err) { 
+      console.error("Error fetching reviews", err); 
+    }
+  };
 
-  useEffect(() => { if (id) fetchReviews(); }, [id]);
+  useEffect(() => { 
+    if (id) fetchReviews(); 
+  }, [id]);
 
   const handleAddToCart = () => {
     if (!token) {
@@ -62,58 +63,62 @@ const fetchReviews = async () => {
       navigate('/login'); 
       return;
     }
-addToCart({
-  id: product.id,
-  name: product.name,
-  price: product.price,
-  image: getImageUrl(product.image) // Use the helper here too
-});
+    addToCart({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: getImageUrl(product.image)
+    });
     alert("Added to cart!");
   };
 
- const handleReviewSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const res = await fetch(`${REVIEW_API}/reviews/${id}`, {
-      method: 'POST',
-      headers: { 
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
-      },
-      body: JSON.stringify({ rating, comment })
-    });
-    if (!res.ok) throw new Error('Failed to submit');
-    setComment("");
-    fetchReviews(); 
-  } catch (err) { 
-    alert("Failed to submit review"); 
-  }
-};
-const handleDeleteReview = async (reviewId) => {
-  if (window.confirm("Are you sure?")) {
+  const handleReviewSubmit = async (e) => {
+    e.preventDefault();
+    console.log('Submitting review to:', `${REVIEW_API}/reviews/${id}`);
     try {
-      const res = await fetch(`${REVIEW_API}/reviews/${reviewId}`, {
-        method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+      const res = await fetch(`${REVIEW_API}/reviews/${id}`, {
+        method: 'POST',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify({ rating, comment })
       });
-      if (!res.ok) throw new Error('Failed to delete');
-      fetchReviews();
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      setComment("");
+      fetchReviews(); 
     } catch (err) { 
-      alert("Failed to delete review"); 
+      console.error("Submit error:", err);
+      alert("Failed to submit review"); 
     }
-  }
-};
+  };
+
+  const handleDeleteReview = async (reviewId) => {
+    if (window.confirm("Are you sure?")) {
+      try {
+        const res = await fetch(`${REVIEW_API}/reviews/${reviewId}`, {
+          method: 'DELETE',
+          headers: { 'Authorization': `Bearer ${token}` }
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        fetchReviews();
+      } catch (err) { 
+        alert("Failed to delete review"); 
+      }
+    }
+  };
+
   if (isLoading) return <div className="details-container">Loading product details...</div>;
 
   return (
     <div className="details-container">
       <div className="product-hero">
         {product.image && (
-<img 
-  src={getImageUrl(product.image)} 
-  alt={product.name} 
-  className="product-image-large"
-/>
+          <img 
+            src={getImageUrl(product.image)} 
+            alt={product.name} 
+            className="product-image-large"
+          />
         )}
         <div className="product-info">
           <h1>{product.name}</h1>
@@ -154,6 +159,3 @@ const handleDeleteReview = async (reviewId) => {
 };
 
 export default ProductDetails;
-
-
-// egegregerfgergfe

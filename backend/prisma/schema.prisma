@@ -16,7 +16,6 @@ model User {
   name      String
   isAdmin   Boolean  @default(false)
   orders    Order[]
-  reviews   Review[]
   createdAt DateTime @default(now())
   cart      Cart?
 }
@@ -43,16 +42,7 @@ model Product {
   createdAt   DateTime   @default(now())
 }
 
-model Review {
-  id        String   @id @default(uuid())
-  rating    Int
-  comment   String?
-  productId String
-  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
-  userId    String
-  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  createdAt DateTime @default(now())
-}
+
 
 model Cart {
   id        String     @id @default(uuid())

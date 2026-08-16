@@ -4,8 +4,7 @@ import { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../context/CartContext'; 
 import api from '../api/axiosConfig';
 import '../style/ProductDetails.css';
-const REVIEW_API = import.meta.env.VITE_REVIEW_SERVICE_URL;
-
+const REVIEW_API = 'https://eyouth-3101016020319-shop-sphere-review-service-gxelwec8g.vercel.app';
 
 
 const ProductDetails = () => {
@@ -47,13 +46,13 @@ const getImageUrl = (image) => {
 const fetchReviews = async () => {
   try {
     const res = await fetch(`${REVIEW_API}/reviews/${id}`);
+    if (!res.ok) throw new Error('Failed to fetch');
     const data = await res.json();
     setReviews(data);
   } catch (err) { 
     console.error("Error fetching reviews", err); 
   }
 };
-
 
   useEffect(() => { if (id) fetchReviews(); }, [id]);
 
@@ -75,7 +74,7 @@ addToCart({
  const handleReviewSubmit = async (e) => {
   e.preventDefault();
   try {
-    await fetch(`${REVIEW_API}/reviews/${id}`, {
+    const res = await fetch(`${REVIEW_API}/reviews/${id}`, {
       method: 'POST',
       headers: { 
         'Content-Type': 'application/json',
@@ -83,6 +82,7 @@ addToCart({
       },
       body: JSON.stringify({ rating, comment })
     });
+    if (!res.ok) throw new Error('Failed to submit');
     setComment("");
     fetchReviews(); 
   } catch (err) { 
@@ -92,17 +92,17 @@ addToCart({
 const handleDeleteReview = async (reviewId) => {
   if (window.confirm("Are you sure?")) {
     try {
-      await fetch(`${REVIEW_API}/reviews/${reviewId}`, {
+      const res = await fetch(`${REVIEW_API}/reviews/${reviewId}`, {
         method: 'DELETE',
         headers: { 'Authorization': `Bearer ${token}` }
       });
+      if (!res.ok) throw new Error('Failed to delete');
       fetchReviews();
     } catch (err) { 
       alert("Failed to delete review"); 
     }
   }
 };
-
   if (isLoading) return <div className="details-container">Loading product details...</div>;
 
   return (

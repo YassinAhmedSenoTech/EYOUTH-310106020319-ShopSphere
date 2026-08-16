@@ -1,0 +1,156 @@
+---
+# Namespace: aws-simulation
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: aws-simulation
+---
+# Namespace: gcp-simulation
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: gcp-simulation
+---
+# AWS Simulation - Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: aws-simulation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+# AWS Simulation - Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: aws-simulation
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+# AWS Simulation - Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: aws-simulation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+# AWS Simulation - Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: aws-simulation
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+# GCP Simulation - Frontend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: gcp-simulation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+# GCP Simulation - Frontend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+  namespace: gcp-simulation
+spec:
+  selector:
+    app: frontend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP
+---
+# GCP Simulation - Backend Deployment
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: gcp-simulation
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: backend
+  template:
+    metadata:
+      labels:
+        app: backend
+    spec:
+      containers:
+      - name: backend
+        image: nginx:latest
+        ports:
+        - containerPort: 80
+---
+# GCP Simulation - Backend Service
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-service
+  namespace: gcp-simulation
+spec:
+  selector:
+    app: backend
+  ports:
+  - port: 80
+    targetPort: 80
+  type: ClusterIP

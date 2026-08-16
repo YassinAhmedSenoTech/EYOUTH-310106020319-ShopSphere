@@ -4,6 +4,9 @@ import { useContext, useState, useEffect } from 'react';
 import { CartContext } from '../context/CartContext'; 
 import api from '../api/axiosConfig';
 import '../style/ProductDetails.css';
+const REVIEW_API = import.meta.env.VITE_REVIEW_SERVICE_URL;
+
+
 
 const ProductDetails = () => {
 
@@ -41,12 +44,16 @@ const getImageUrl = (image) => {
     queryFn: () => api.get(`/products/${id}`).then(res => res.data)
   });
 
-  const fetchReviews = async () => {
-    try {
-      const res = await api.get(`/reviews/${id}`);
-      setReviews(res.data);
-    } catch (err) { console.error("Error fetching reviews", err); }
-  };
+const fetchReviews = async () => {
+  try {
+    const res = await fetch(`${REVIEW_API}/reviews/${id}`);
+    const data = await res.json();
+    setReviews(data);
+  } catch (err) { 
+    console.error("Error fetching reviews", err); 
+  }
+};
+
 
   useEffect(() => { if (id) fetchReviews(); }, [id]);
 
@@ -65,23 +72,36 @@ addToCart({
     alert("Added to cart!");
   };
 
-  const handleReviewSubmit = async (e) => {
-    e.preventDefault();
+ const handleReviewSubmit = async (e) => {
+  e.preventDefault();
+  try {
+    await fetch(`${REVIEW_API}/reviews/${id}`, {
+      method: 'POST',
+      headers: { 
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({ rating, comment })
+    });
+    setComment("");
+    fetchReviews(); 
+  } catch (err) { 
+    alert("Failed to submit review"); 
+  }
+};
+const handleDeleteReview = async (reviewId) => {
+  if (window.confirm("Are you sure?")) {
     try {
-      await api.post(`/reviews/${id}`, { rating, comment });
-      setComment("");
-      fetchReviews(); 
-    } catch (err) { alert("Failed to submit review"); }
-  };
-
-  const handleDeleteReview = async (reviewId) => {
-    if (window.confirm("Are you sure you want to delete this review?")) {
-      try {
-        await api.delete(`/reviews/${reviewId}`);
-        fetchReviews();
-      } catch (err) { alert("Failed to delete review"); }
+      await fetch(`${REVIEW_API}/reviews/${reviewId}`, {
+        method: 'DELETE',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      fetchReviews();
+    } catch (err) { 
+      alert("Failed to delete review"); 
     }
-  };
+  }
+};
 
   if (isLoading) return <div className="details-container">Loading product details...</div>;
 

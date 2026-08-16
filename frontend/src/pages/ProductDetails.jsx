@@ -5,7 +5,7 @@ import { CartContext } from '../context/CartContext';
 import api from '../api/axiosConfig';
 import '../style/ProductDetails.css';
 
-const REVIEW_API = 'https://eyouth-3101016020319-shop-sphere-review-service-j4d2y46j8.vercel.app';
+const REVIEW_API = 'https://eyouth-3101016020319-shop-sphere-re.vercel.app';
 
 const getImageUrl = (image) => {
   if (!image) return '';

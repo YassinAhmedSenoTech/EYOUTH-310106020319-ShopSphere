@@ -114,6 +114,10 @@ import adminRoutes from './routes/adminRoutes.js';
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+app.set('trust proxy', 1);
+
+
+
 // MongoDB connection (safe for Vercel — won't crash if it fails)
 if (process.env.NODE_ENV !== 'test' && process.env.MONGODB_URI) {
   connectMongoDB().catch(err => {

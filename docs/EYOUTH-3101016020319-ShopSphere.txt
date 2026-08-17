@@ -1,0 +1,22 @@
+EYOUTH-3101016020319-ShopSphere
+Rollback Plan
+
+Detection
+- Failed releases are detected by the UptimeRobot monitoring configured in Task 1.
+- UptimeRobot polls the /health endpoint every 5 minutes.
+- If the endpoint returns a non-200 status or becomes unreachable, UptimeRobot sends 
+  an alert and marks the monitor as DOWN.
+- The on-call engineer receives the alert and confirms the failure by checking the 
+  Vercel production deployment logs for build or runtime errors.
+
+Restoration Steps
+1. Log in to the Vercel Dashboard and open the ShopSphere production project.
+2. Navigate to the Deployments tab.
+3. Identify the previous working deployment (the one before the failed release, 
+   marked as Ready and with a green check).
+4. Click the three-dot menu on that deployment and select Promote to Production.
+5. Wait for Vercel to complete the promotion (typically under 60 seconds).
+6. Verify the rollback by opening the public application URL in a browser and 
+   confirming the /health endpoint returns {"status":"ok"}.
+7. Confirm UptimeRobot reports the monitor as UP again.
+8. Keep the failed deployment in the history for investigation; do not delete it.

@@ -1,6 +1,7 @@
 
 
 
+
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -14,6 +15,8 @@ import categoryRoutes from './routes/CategoryRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import { requestLogger, errorLogger } from './middleware/logger.js';
+
 
 const app = express();
 app.set('trust proxy', 1);
@@ -49,6 +52,9 @@ app.use(cors({
 
 app.use(express.json());
 
+app.use(requestLogger);
+
+
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
@@ -57,6 +63,9 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/cart', cartRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/admin', adminRoutes);
+
+
+
 
 // Health check endpoint
 app.get('/health', (req, res) => {
@@ -69,10 +78,7 @@ app.get('/', (req, res) => {
 });
 
 // Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+app.use(errorLogger);
 
 // Only listen locally (NOT on Vercel)
 if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {

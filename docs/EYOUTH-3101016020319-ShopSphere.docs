@@ -1,0 +1,15 @@
+EYOUTH-3101016020319-ShopSphere
+
+Architecture Decision Record
+
+1. Extraction of the Reviews Functionality into a Microservice
+
+The reviews functionality. Creating, reading and deleting product reviews. Was extracted from the ShopSphere monolith. Deployed as an independent Review Service with its own codebase, its own deployment and its own public URL.
+
+Reason: Reviews form a self-contained domain with a data model and business boundary. Separating them reduces coupling in the application allows the review workload to be deployed and scaled independently and follows the single-responsibility principle. Because reviews are ancillary to the core shopping flow (browsing, cart and checkout) their maintenance or failure does not bring down the platform making them a low-risk high-value candidate for extraction.
+
+2. Migration of the Report Generation Workload to Serverless
+
+The report-generation background task was moved from the application to a Vercel Serverless Function exposed at /api/report.
+
+Reason: Report generation is a event-driven workload that does not require a continuously running server. Serverless execution is cost-effective, for tasks because it scales to zero when idle and scales up automatically on demand. Moving it outside the application eliminates the need to provision dedicated infrastructure for a non-critical background process and keeps the core application focused on its primary e-commerce responsibilities.

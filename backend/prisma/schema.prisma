@@ -38,7 +38,6 @@ model Product {
   category    Category   @relation(fields: [categoryId], references: [id])
   cartItems   CartItem[]
   orderItems  OrderItem[]
-  reviews     Review[]
   createdAt   DateTime   @default(now())
 }
 

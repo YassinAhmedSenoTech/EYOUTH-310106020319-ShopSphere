@@ -1,0 +1,30 @@
+
+CLOUD SERVICE CLASSIFICATION
+
+Student: EYOUTH-3101016020319
+
+1. Frontend Hosting is done by Vercel.
+
+The classification of Vercel is PaaS.
+
+The reason for this classification is that Vercel provides a managed platform where the code is deployed and run.
+
+The student does not have to manage the servers or the operating systems or the infrastructure when using Vercel.
+
+2. Backend Hosting is also done by Vercel.
+
+The classification of Vercel for backend hosting is also PaaS.
+
+The reason for this classification is the same as for the frontend. Vercel manages the runtime and the scaling and the infrastructure.
+
+The student only has to supply the application code when using Vercel for backend hosting.
+
+3. The database used is Supabase Database.
+
+The classification of Supabase Database is PaaS.
+
+The reason, for this classification is that Supabase Database offers a managed PostgreSQL platform.
+
+This platform has backups and scaling and maintenance.
+
+The student manages the schema and the data but not the underlying database server or the infrastructure when using Supabase Database.

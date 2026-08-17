@@ -1,6 +1,3 @@
-
-
-
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
@@ -14,14 +11,11 @@ import categoryRoutes from './routes/CategoryRoutes.js';
 import cartRoutes from './routes/cartRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import { requestLogger, errorLogger } from './middleware/logger.js';
 
 const app = express();
 app.set('trust proxy', 1);
-
 const PORT = process.env.PORT || 5000;
-
-
-
 
 if (process.env.NODE_ENV !== 'test' && process.env.MONGODB_URI) {
   connectMongoDB().catch(err => {
@@ -49,6 +43,9 @@ app.use(cors({
 
 app.use(express.json());
 
+// Request logging (must come after body parsing, before routes)
+app.use(requestLogger);
+
 // API Routes
 app.use('/api/products', productRoutes);
 app.use('/api/auth', authRoutes);
@@ -68,11 +65,8 @@ app.get('/', (req, res) => {
   res.json({ status: 'active', message: 'E-commerce Engine Online' });
 });
 
-// Error handler
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Internal Server Error' });
-});
+// Error handler (must be last)
+app.use(errorLogger);
 
 // Only listen locally (NOT on Vercel)
 if (!process.env.VERCEL && process.env.NODE_ENV !== 'test') {
